@@ -23,7 +23,8 @@ defmodule SnipsNlu.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:rustler, "~> 0.18"}
+      {:rustler, "~> 0.18"},
+      {:jason, "~> 1.0", only: :test}
     ]
   end
 

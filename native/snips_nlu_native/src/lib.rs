@@ -2,8 +2,8 @@
 // #[macro_use] extern crate rustler_codegen;
 #[macro_use] extern crate lazy_static;
 
-extern crate failure;
 extern crate snips_nlu_lib;
+extern crate serde_json;
 
 use std::fs;
 use std::io::Error as IoError;
@@ -17,7 +17,6 @@ mod atoms {
     rustler_atoms! {
         atom ok;
         atom error;
-        atom eof;
 
         // Posix
         atom enoent; // File does not exist
@@ -35,7 +34,7 @@ rustler_export_nifs! {
     "Elixir.Snips.NLU.Native",
     [
         ("engine_open", 1, engine_open),
-        ("add", 2, add)
+        ("parse", 2, parse)
     ],
     Some(on_load)
 }
@@ -57,13 +56,6 @@ fn on_load(env: Env, _info: Term) -> bool {
     true
 }
 
-fn add<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
-    let num1: i64 = try!(args[0].decode());
-    let num2: i64 = try!(args[1].decode());
-
-    Ok((atoms::ok(), num1 + num2).encode(env))
-}
-
 fn engine_open<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
     let path: String = try!(args[0].decode());
 
@@ -83,5 +75,15 @@ fn engine_open<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
         engine: engine,
     });
 
-    Ok(resource.encode(env))
+    Ok((atoms::ok(), resource).encode(env))
+}
+
+fn parse<'a>(env: Env<'a>, args: &[Term<'a>]) -> NifResult<Term<'a>> {
+    let resource: ResourceArc<EngineResource> = args[0].decode()?;
+    let query: String = try!(args[1].decode());
+
+    let result = resource.engine.parse(query.trim(), None).unwrap();
+    let result_json = serde_json::to_string(&result).unwrap();
+
+    Ok((atoms::ok(), result_json).encode(env))
 }

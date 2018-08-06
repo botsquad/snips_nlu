@@ -1,3 +1,4 @@
 %{
+  "jason": {:hex, :jason, "1.1.1", "d3ccb840dfb06f2f90a6d335b536dd074db748b3e7f5b11ab61d239506585eb2", [:mix], [{:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm"},
   "rustler": {:hex, :rustler, "0.18.0", "db4bd0c613d83a1badc31be90ddada6f9821de29e4afd15c53a5da61882e4f2d", [:mix], [], "hexpm"},
 }
